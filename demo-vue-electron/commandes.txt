@@ -1,0 +1,5 @@
+//Créer un projet Electron+Vue avec Vite
+npm create electron-Vite
+
+//Exécuter en mode développement
+npm run dev
