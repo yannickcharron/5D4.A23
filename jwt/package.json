@@ -1,0 +1,25 @@
+{
+  "name": "demo-jwt",
+  "version": "1.0.0",
+  "description": "Exemple en classe 5D4 A23 - JWT",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js --inspect"
+  },
+  "author": "Yannick Charron",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv-flow": "^3.3.0",
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "dayjs": "^1.11.9",
+    "express": "^4.18.2",
+    "http-errors": "^2.0.0",
+    "mongoose": "^7.5.0"
+  }
+}
