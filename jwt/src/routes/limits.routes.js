@@ -11,9 +11,22 @@ const limiter = expressRateLimit({
     message:'Too many requests'
 });
 
+const speedLimiter = expressSlowDown({
+    windowMs: 10 * 60 * 1000,
+    delayAfter: 10,
+    delayMs:500
+});
+
+
 class LimitRoutes {
     constructor() {
         router.get('/rate-limit', limiter, this.rateLimit);
+        router.get('/speed-limit', speedLimiter, this.speedLimit);
+    }
+
+    speedLimit(req, res) {
+        console.log(req.ip);
+        res.status(200).json(req.slowDown);
     }
 
     rateLimit(req, res) {
