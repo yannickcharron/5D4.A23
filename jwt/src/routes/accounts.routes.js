@@ -8,8 +8,13 @@ class AccountRoutes {
 
     constructor() {
         router.post('/', this.post);
+        router.get('/:idAccount', this.getOne);
         router.post('/actions/login', this.login);
 
+    }
+
+    getOne(req, res, next) {
+        
     }
 
     async login(req, res, next) {
@@ -22,8 +27,9 @@ class AccountRoutes {
         if(result.account) {
             //Nous sommes connectés
             let account = result.account.toObject({getters:false, virtuals:false});
-            //TODO: Genération des JWTs
-            res.status(201).json(account);
+            account = accountRepository.transform(account);
+            const tokens = accountRepository.generateJWT(account.email);
+            res.status(201).json({account, tokens});
         } else {
             //Erreur lors de la connexion
             return next(result.err);
@@ -33,7 +39,10 @@ class AccountRoutes {
     async post(req, res, next) {
         try {
             let account = await accountRepository.create(req.body);
-            res.status(201).json(account);
+            account = account.toObject({getters:false, virtuals:false});
+            account = accountRepository.transform(account);
+            const tokens = accountRepository.generateJWT(account.email);
+            res.status(201).json({account, tokens});
         } catch(err) {
             return next(err);
         }

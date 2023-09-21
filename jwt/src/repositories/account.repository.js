@@ -1,6 +1,7 @@
 import HttpError from 'http-errors';
 import { v4 as uuidv4 } from 'uuid';
 import argon2d from 'argon2';
+import jwt from 'jsonwebtoken';
 
 import { Account } from '../models/account.model.js';
 
@@ -23,8 +24,18 @@ class AccountRepository {
 
     }
 
-    generateJWT() {
-        
+    generateJWT(email) {
+        const accessToken = jwt.sign(
+            {email}, 
+            process.env.JWT_PRIVATE_SECRET, 
+            {expiresIn: process.env.JWT_LIFE, issuer:process.env.BASE_URL});
+
+        const refreshToken = jwt.sign(
+            {email}, 
+            process.env.JWT_REFRESH_SECRET, 
+            {expiresIn: process.env.JWT_REFRESH_LIFE, issuer:process.env.BASE_URL});
+
+        return { accessToken, refreshToken };
     }
 
 
@@ -40,11 +51,23 @@ class AccountRepository {
         try {
             account.uuid = uuidv4();
             account.passwordHash = await argon2d.hash(account.password);
-            delete account.password; //supprime le mot de passe en clair de l'objet avant de le sauvegarder
             return Account.create(account);
         } catch(err) {
             throw err;
         }
+    }
+
+    transform(account, transformOptions = {}) {
+
+        account.href = `${process.env.BASE_URL}/accounts/${account._id}`;
+
+        delete account._id;
+        delete account.__v;
+        delete account.password; //supprime le mot de passe en clair de l'objet avant de le sauvegarder
+        delete account.passwordHash;
+
+        return account;
+
     }
 }
 
