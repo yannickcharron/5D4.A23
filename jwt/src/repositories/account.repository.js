@@ -51,10 +51,15 @@ class AccountRepository {
         try {
             account.uuid = uuidv4();
             account.passwordHash = await argon2d.hash(account.password);
+            delete account.password;
             return Account.create(account);
         } catch(err) {
             throw err;
         }
+    }
+
+    retrieveById(idAccount) {
+        return Account.findById(idAccount);
     }
 
     transform(account, transformOptions = {}) {

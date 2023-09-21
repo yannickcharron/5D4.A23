@@ -7,7 +7,7 @@ const accountSchema = mongoose.Schema({
     uuid: { type: String, required:true, unique:true },
     passwordHash: { type: String, required:true },
     roles: [String],
-    isPublic: { type: Boolean, default: true },
+    isPublic: { type: Boolean, default: false },
     isBanned: { type: Boolean, default: false }
 }, {
     collection:'accounts',

@@ -1,6 +1,8 @@
 import express from 'express';
 import HttpError from 'http-errors';
+
 import accountRepository from '../repositories/account.repository.js';
+import { authorizationJWT } from '../middlewares/authorization.jwt.js';
 
 const router = express.Router();
 
@@ -8,13 +10,35 @@ class AccountRoutes {
 
     constructor() {
         router.post('/', this.post);
-        router.get('/:idAccount', this.getOne);
+        router.get('/:idAccount', authorizationJWT, this.getOne);
         router.post('/actions/login', this.login);
 
     }
 
-    getOne(req, res, next) {
-        
+    async getOne(req, res, next) {
+        try {
+            const { email } = req.auth;
+
+            const idAccount = req.params.idAccount;
+            let account = await accountRepository.retrieveById(idAccount);
+            if(!account) {
+                return next(HttpError.NotFound());
+            }
+            
+            const isMe = email === account.email;
+            if(!isMe && !account.isPublic) {
+                return next(HttpError.Forbidden());
+            }
+
+            account = account.toObject({getters:false, virtuals:false});
+            account = accountRepository.transform(account);
+            
+
+            res.status(200).json(account);
+
+        } catch(err) {
+            return next(err);
+        }
     }
 
     async login(req, res, next) {
