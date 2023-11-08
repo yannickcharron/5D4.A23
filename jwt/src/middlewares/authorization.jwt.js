@@ -10,4 +10,11 @@ const authorizationJWT = expressjwt({
     }
 });
 
-export { authorizationJWT };
+const refreshJWT = expressjwt({
+    secret: process.env.JWT_REFRESH_SECRET,
+    issuer: process.env.BASE_URL,
+    algorithms: ['HS256'],
+    requestProperty: 'refreshToken'
+});
+
+export { authorizationJWT, refreshJWT };

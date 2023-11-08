@@ -2,7 +2,7 @@ import express from 'express';
 import HttpError from 'http-errors';
 
 import accountRepository from '../repositories/account.repository.js';
-import { authorizationJWT } from '../middlewares/authorization.jwt.js';
+import { authorizationJWT, refreshJWT } from '../middlewares/authorization.jwt.js';
 
 const router = express.Router();
 
@@ -12,6 +12,7 @@ class AccountRoutes {
         router.post('/', this.post);
         router.get('/:idAccount', authorizationJWT, this.getOne);
         router.post('/actions/login', this.login);
+        router.post('/actions/refresh', refreshJWT ,this.refresh);
 
     }
 
@@ -71,6 +72,16 @@ class AccountRoutes {
             return next(err);
         }
 
+    }
+
+    refresh(req, res, next) {
+
+        try {
+            const tokens = accountRepository.generateJWT(req.refreshToken.email);
+            res.status(201).json(tokens);
+        } catch(err) {
+            return next(err);
+        }
     }
 }
 
